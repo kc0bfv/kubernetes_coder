@@ -1,0 +1,30 @@
+{{- if .Values.coder.serviceAccount.workspaceDifferentNamespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: coder-workspace-perms
+  namespace: {{ .Values.coder.serviceAccount.workspaceNamespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: coder
+  namespace: {{ .Values.coder.serviceAccount.workspaceNamespace }}
+subjects:
+  - kind: ServiceAccount
+    name: coder
+    namespace: {{ .Values.coder.serviceAccount.regularNamespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: coder-workspace-perms
+{{- end }}
